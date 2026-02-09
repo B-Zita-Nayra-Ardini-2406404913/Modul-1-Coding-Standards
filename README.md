@@ -1,0 +1,2 @@
+### Reflection 1
+Dari source code yang ada pada modul 1, saya menemukan masalah bahwa setiap kali produk dibuat (create), nilai id nya tidak ditentukan atau masih null. Karena itu, pada kedua fitur yang saya kerjakan saya terapkan hal yang berbeda. Saya tidak mengubah tipe data id nya, masih berupa string. Akan tetapi, setiap kali di create, produk akan memiliki nilai UUID dalam bentuk string. Nantinya, ketika akan mengedit ataupun menghapus produk, repository hanya perlu mencocokkan id nya saja.
