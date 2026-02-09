@@ -44,10 +44,6 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
 tasks.register<Test>("unitTest") {
     description = "Runs unit tests."
     group = "verification"
@@ -64,4 +60,8 @@ tasks.register<Test>("functionalTest") {
     filter {
         includeTestsMatching("*FunctionalTest")
     }
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
