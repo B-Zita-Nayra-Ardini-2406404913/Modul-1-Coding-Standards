@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class ProductRepository {
@@ -15,6 +16,29 @@ public class ProductRepository {
         productData.add(product);
         return product;
     }
+
+    public Product findById (String idToSearch) {
+        Product result = null;
+        for (Product p: productData){
+            if (idToSearch.equals(p.getProductId())){
+                result = p;
+            }
+        }
+        return result;
+    }
+
+    public Product edit(Product product) {
+        Product existingProduct = findById(product.getProductId());
+
+        if (existingProduct != null) {
+            existingProduct.setProductName(product.getProductName());
+            existingProduct.setProductQuantity(product.getProductQuantity());
+            return existingProduct;
+        }
+
+        throw new RuntimeException("Product with ID " + product.getProductId() + " not found");
+    }
+
 
     public Iterator<Product> findAll(){
         return productData.iterator();
