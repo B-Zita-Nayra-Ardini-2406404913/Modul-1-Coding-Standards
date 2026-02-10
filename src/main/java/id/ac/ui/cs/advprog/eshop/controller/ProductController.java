@@ -28,7 +28,13 @@ public class ProductController {
     public String createProductPost(@ModelAttribute Product product, Model model){
         product.setProductId(UUID.randomUUID().toString());
         service.create(product);
-        return "redirect:list";
+        return "redirect:/product/list";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteProduct(@PathVariable String id) {
+        service.delete(id);
+        return "redirect:/product/list";
     }
 
     @GetMapping("/edit/{id}")
