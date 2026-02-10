@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.Objects;
 
 @Repository
 public class ProductRepository {
@@ -38,6 +39,19 @@ public class ProductRepository {
 
         throw new RuntimeException("Product with ID " + productId + " not found");
     }
+
+    public Product edit(Product product) {
+        Product existingProduct = findById(product.getProductId());
+
+        if (existingProduct != null) {
+            existingProduct.setProductName(product.getProductName());
+            existingProduct.setProductQuantity(product.getProductQuantity());
+            return existingProduct;
+        }
+
+        throw new RuntimeException("Product with ID " + product.getProductId() + " not found");
+    }
+
 
     public Iterator<Product> findAll(){
         return productData.iterator();
