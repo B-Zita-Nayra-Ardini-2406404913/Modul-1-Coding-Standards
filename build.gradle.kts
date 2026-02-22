@@ -3,6 +3,14 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.5.10"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.sonarqube") version "7.1.0.6387"
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "B-Zita-Nayra-Ardini-2406404913_Modul-1-Coding-Standards")
+        property("sonar.organization", "b-zita-nayra-ardini-2406404913")
+    }
 }
 
 group = "id.ac.ui.cs.advprog"
