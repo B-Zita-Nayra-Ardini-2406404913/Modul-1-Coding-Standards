@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.eshop.repository;
 
+import id.ac.ui.cs.advprog.eshop.exception.ProductNotFoundException;
 import id.ac.ui.cs.advprog.eshop.model.Product;
 import org.springframework.stereotype.Repository;
 
@@ -37,7 +38,7 @@ public class ProductRepository {
             return existingProduct;
         }
 
-        throw new RuntimeException("Product with ID " + productId + " not found");
+        throw new ProductNotFoundException(productId);
     }
 
     public Product edit(Product product) {
@@ -49,7 +50,7 @@ public class ProductRepository {
             return existingProduct;
         }
 
-        throw new RuntimeException("Product with ID " + product.getProductId() + " not found");
+        throw new ProductNotFoundException(product.getProductId());
     }
 
 
