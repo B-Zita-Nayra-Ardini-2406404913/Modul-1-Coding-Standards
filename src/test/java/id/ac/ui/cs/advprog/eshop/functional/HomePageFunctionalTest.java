@@ -41,33 +41,23 @@ class ProductListPageFunctionalTest {
     }
 
     @Test
-    void pageTitle_isCorrect(ChromeDriver driver) throws Exception {
-        // Exercise
+    void pageTitle_isCorrect(ChromeDriver driver) {
         driver.get(baseUrl);
         String pageTitle = driver.getTitle();
-
-        // Verify
         assertEquals("Product List", pageTitle);
     }
 
     @Test
-    void pageHeading_productListPage_isCorrect(ChromeDriver driver) throws Exception {
-        // Exercise
+    void pageHeading_productListPage_isCorrect(ChromeDriver driver) {
         driver.get(baseUrl);
-        String pageHeading = driver.findElement(By.tagName("h2"))
-                .getText();
-
-        // Verify
+        String pageHeading = driver.findElement(By.tagName("h2")).getText();
         assertEquals("Product' List", pageHeading);
     }
 
     @Test
-    void createProductButton_isPresent(ChromeDriver driver) throws Exception {
-        // Exercise
+    void createProductButton_isPresent(ChromeDriver driver) {
         driver.get(baseUrl);
         WebElement createButton = driver.findElement(By.linkText("Create Product"));
-
-        // Verify
         assertTrue(createButton.isDisplayed());
     }
 }
