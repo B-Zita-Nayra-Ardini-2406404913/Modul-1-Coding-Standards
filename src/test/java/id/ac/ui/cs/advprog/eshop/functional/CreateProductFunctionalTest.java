@@ -37,60 +37,43 @@ class CreateProductPageFunctionalTest {
     }
 
     @Test
-    void pageTitle_isCorrect(ChromeDriver driver) throws Exception {
-        // Exercise
+    void pageTitle_isCorrect(ChromeDriver driver) {
         driver.get(baseUrl);
         String pageTitle = driver.getTitle();
-
-        // Verify
         assertEquals("Create New Product", pageTitle);
     }
 
     @Test
-    void pageHeading_createProductPage_isCorrect(ChromeDriver driver) throws Exception {
-        // Exercise
+    void pageHeading_createProductPage_isCorrect(ChromeDriver driver) {
         driver.get(baseUrl);
-        String pageHeading = driver.findElement(By.tagName("h3"))
-                .getText();
-
-        // Verify
+        String pageHeading = driver.findElement(By.tagName("h3")).getText();
         assertEquals("Create New Product", pageHeading);
     }
 
     @Test
-    void nameInputField_isPresent(ChromeDriver driver) throws Exception {
-        // Exercise
+    void nameInputField_isPresent(ChromeDriver driver) {
         driver.get(baseUrl);
         WebElement nameInput = driver.findElement(By.id("nameInput"));
-
-        // Verify
         assertTrue(nameInput.isDisplayed());
     }
 
     @Test
-    void quantityInputField_isPresent(ChromeDriver driver) throws Exception {
-        // Exercise
+    void quantityInputField_isPresent(ChromeDriver driver) {
         driver.get(baseUrl);
         WebElement quantityInput = driver.findElement(By.id("quantityInput"));
-
-        // Verify
         assertTrue(quantityInput.isDisplayed());
     }
 
     @Test
-    void submitButton_isPresent(ChromeDriver driver) throws Exception {
-        // Exercise
+    void submitButton_isPresent(ChromeDriver driver) {
         driver.get(baseUrl);
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
-
-        // Verify
         assertTrue(submitButton.isDisplayed());
         assertEquals("Submit", submitButton.getText());
     }
 
     @Test
-    void createProduct_redirectsToProductList(ChromeDriver driver) throws Exception {
-        // Exercise
+    void createProduct_redirectsToProductList(ChromeDriver driver) {
         driver.get(baseUrl);
 
         WebElement nameInput = driver.findElement(By.id("nameInput"));
@@ -101,7 +84,6 @@ class CreateProductPageFunctionalTest {
         quantityInput.sendKeys("10");
         submitButton.click();
 
-        // Verify
         new WebDriverWait(driver, Duration.ofSeconds(5))
                 .until(ExpectedConditions.urlContains("/product/list"));
         String currentUrl = driver.getCurrentUrl();
