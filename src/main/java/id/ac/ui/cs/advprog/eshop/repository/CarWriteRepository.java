@@ -4,6 +4,6 @@ import id.ac.ui.cs.advprog.eshop.model.Car;
 
 public interface CarWriteRepository {
     Car create(Car product);
-    Car update(Car product);
-    Car delete(String productId);
+    Car update(String id, Car updatedCar);
+    void delete(String productId);
 }
