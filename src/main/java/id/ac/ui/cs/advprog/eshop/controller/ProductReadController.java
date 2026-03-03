@@ -1,6 +1,5 @@
 package id.ac.ui.cs.advprog.eshop.controller;
 
-import id.ac.ui.cs.advprog.eshop.model.PhysicalProduct;
 import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.service.ProductQueryService;
 import org.springframework.stereotype.Controller;
@@ -38,7 +37,7 @@ public class ProductReadController {
     @GetMapping("/create")
     public String createProductPage(Model model) {
         // LSP: form cukup tahu bahwa ini Product; tipe konkretnya bisa diganti bebas.
-        model.addAttribute("product", new PhysicalProduct());
+        model.addAttribute("product", new Product());
         return "createProduct";
     }
 }
