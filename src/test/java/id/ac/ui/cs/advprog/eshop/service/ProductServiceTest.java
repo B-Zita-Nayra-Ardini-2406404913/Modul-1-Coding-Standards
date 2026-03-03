@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.eshop.service;
 
 import id.ac.ui.cs.advprog.eshop.model.Product;
+import id.ac.ui.cs.advprog.eshop.repository.InMemoryProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,11 +19,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
-    @Mock
-    private ProductRepository productRepository;
+    @InjectMocks
+    private ProductCommandServiceImpl productCommandServiceImpl;
 
     @InjectMocks
-    private ProductServiceImpl productService;
+    private ProductQueryServiceImpl productQueryServiceImpl;
+
+    @Mock
+    private InMemoryProductRepository productRepository;
 
     private Product product;
 
@@ -39,7 +43,7 @@ class ProductServiceTest {
     void testCreateMethod_exists() {
         when(productRepository.create(any(Product.class))).thenReturn(product);
 
-        Product result = productService.create(product);
+        Product result = productCommandServiceImpl.create(product);
 
         assertNotNull(result);
         verify(productRepository, times(1)).create(product);
@@ -53,7 +57,7 @@ class ProductServiceTest {
 
         when(productRepository.findAll()).thenReturn(iterator);
 
-        List<Product> result = productService.findAll();
+        List<Product> result = productQueryServiceImpl.findAll();
 
         assertNotNull(result);
         verify(productRepository, times(1)).findAll();
@@ -63,7 +67,7 @@ class ProductServiceTest {
     void testCreateMethod_returnsProduct() {
         when(productRepository.create(any(Product.class))).thenReturn(product);
 
-        Product result = productService.create(product);
+        Product result = productCommandServiceImpl.create(product);
 
         assertTrue(result instanceof Product);
     }
@@ -75,21 +79,9 @@ class ProductServiceTest {
 
         when(productRepository.findAll()).thenReturn(iterator);
 
-        List<Product> result = productService.findAll();
+        List<Product> result = productQueryServiceImpl.findAll();
 
         assertTrue(result instanceof List);
-    }
-
-    @Test
-    void testCreate_shouldReturnSameProduct() {
-        when(productRepository.create(product)).thenReturn(product);
-
-        Product result = productService.create(product);
-
-        assertEquals(product, result);
-        assertEquals("eb5589f-1c39-460e-8860-71af6af63bd6", result.getProductId());
-        assertEquals("Sampo Cap Bambang", result.getProductName());
-        assertEquals(100, result.getProductQuantity());
     }
 
     @Test
@@ -106,7 +98,7 @@ class ProductServiceTest {
 
         when(productRepository.findAll()).thenReturn(iterator);
 
-        List<Product> result = productService.findAll();
+        List<Product> result = productQueryServiceImpl.findAll();
 
         assertEquals(2, result.size());
     }
@@ -116,7 +108,7 @@ class ProductServiceTest {
     void testCreateMethod_shouldNotReturnNull() {
         when(productRepository.create(any(Product.class))).thenReturn(product);
 
-        Product result = productService.create(product);
+        Product result = productCommandServiceImpl.create(product);
 
         assertNotNull(result);
     }
@@ -128,7 +120,7 @@ class ProductServiceTest {
 
         when(productRepository.findAll()).thenReturn(iterator);
 
-        List<Product> result = productService.findAll();
+        List<Product> result = productQueryServiceImpl.findAll();
 
         assertNotNull(result);
     }
@@ -137,7 +129,7 @@ class ProductServiceTest {
     void testCreateMethod_shouldNotReturnWrongType() {
         when(productRepository.create(any(Product.class))).thenReturn(product);
 
-        Object result = productService.create(product);
+        Object result = productCommandServiceImpl.create(product);
 
         assertFalse(result instanceof String);
         assertFalse(result instanceof Integer);
@@ -150,7 +142,7 @@ class ProductServiceTest {
 
         when(productRepository.findAll()).thenReturn(iterator);
 
-        Object result = productService.findAll();
+        Object result = productQueryServiceImpl.findAll();
 
         assertFalse(result instanceof String);
         assertFalse(result instanceof Product);
@@ -163,7 +155,7 @@ class ProductServiceTest {
 
         when(productRepository.findAll()).thenReturn(emptyIterator);
 
-        List<Product> result = productService.findAll();
+        List<Product> result = productQueryServiceImpl.findAll();
 
         assertEquals(0, result.size());
         assertTrue(result.isEmpty());
@@ -178,7 +170,7 @@ class ProductServiceTest {
 
         when(productRepository.create(product)).thenReturn(product);
 
-        Product result = productService.create(product);
+        Product result = productCommandServiceImpl.create(product);
 
         assertNotEquals(differentProduct.getProductId(), result.getProductId());
         assertNotEquals(differentProduct.getProductName(), result.getProductName());

@@ -5,11 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class Product {
-
+public class Product {
     private String productId;
     private String productName;
     private int productQuantity;
-
-    public abstract String getProductType();
 }

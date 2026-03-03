@@ -1,6 +1,6 @@
 package id.ac.ui.cs.advprog.eshop.controller;
 
-import id.ac.ui.cs.advprog.eshop.model.PhysicalProduct;
+import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.service.ProductCommandService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,13 +19,13 @@ public class ProductWriteController {
     }
 
     @PostMapping("/create")
-    public String createProductPost(@ModelAttribute PhysicalProduct product) {
+    public String createProductPost(@ModelAttribute Product product) {
         commandService.create(product);
         return "redirect:/product/list";
     }
 
     @PostMapping("/edit")
-    public String editProductPost(@ModelAttribute PhysicalProduct product) {
+    public String editProductPost(@ModelAttribute Product product) {
         commandService.edit(product);
         return "redirect:list";
     }
