@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.eshop.service;
 
 import id.ac.ui.cs.advprog.eshop.model.Product;
+import id.ac.ui.cs.advprog.eshop.repository.InMemoryProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +20,13 @@ import static org.mockito.Mockito.*;
 class ProductServiceImplTest {
 
     @InjectMocks
-    private ProductServiceImpl productService;
+    private ProductCommandServiceImpl productCommandServiceImpl;
+
+    @InjectMocks
+    private ProductQueryServiceImpl productQueryServiceImpl;
 
     @Mock
-    private ProductRepository productRepository;
+    private InMemoryProductRepository productRepository;
 
     private Product product;
 
@@ -39,26 +43,17 @@ class ProductServiceImplTest {
     void testCreate_shouldCallRepositoryAndReturnProduct() {
         when(productRepository.create(product)).thenReturn(product);
 
-        Product result = productService.create(product);
+        Product result = productCommandServiceImpl.create(product);
 
         assertEquals(product, result);
         verify(productRepository, times(1)).create(product);
     }
 
     @Test
-    void testCreate_shouldReturnProductWithCorrectId() {
-        when(productRepository.create(product)).thenReturn(product);
-
-        Product result = productService.create(product);
-
-        assertEquals("eb5589f-1c39-460e-8860-71af6af63bd6", result.getProductId());
-    }
-
-    @Test
     void testCreate_shouldReturnProductWithCorrectName() {
         when(productRepository.create(product)).thenReturn(product);
 
-        Product result = productService.create(product);
+        Product result = productCommandServiceImpl.create(product);
 
         assertEquals("Sampo Cap Bambang", result.getProductName());
     }
@@ -67,7 +62,7 @@ class ProductServiceImplTest {
     void testCreate_shouldReturnProductWithCorrectQuantity() {
         when(productRepository.create(product)).thenReturn(product);
 
-        Product result = productService.create(product);
+        Product result = productCommandServiceImpl.create(product);
 
         assertEquals(100, result.getProductQuantity());
     }
@@ -87,7 +82,7 @@ class ProductServiceImplTest {
 
         when(productRepository.findAll()).thenReturn(productIterator);
 
-        List<Product> result = productService.findAll();
+        List<Product> result = productQueryServiceImpl.findAll();
 
         assertEquals(2, result.size());
         assertEquals(product.getProductId(), result.get(0).getProductId());
@@ -102,7 +97,7 @@ class ProductServiceImplTest {
 
         when(productRepository.findAll()).thenReturn(emptyIterator);
 
-        List<Product> result = productService.findAll();
+        List<Product> result = productQueryServiceImpl.findAll();
 
         assertEquals(0, result.size());
         assertTrue(result.isEmpty());
@@ -115,7 +110,7 @@ class ProductServiceImplTest {
 
         when(productRepository.findAll()).thenReturn(productIterator);
 
-        productService.findAll();
+        productQueryServiceImpl.findAll();
 
         verify(productRepository, times(1)).findAll();
     }
@@ -126,7 +121,7 @@ class ProductServiceImplTest {
         String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
         when(productRepository.findById(productId)).thenReturn(product);
 
-        Product result = productService.findById(productId);
+        Product result = productQueryServiceImpl.findById(productId);
 
         assertEquals(product, result);
         assertEquals(productId, result.getProductId());
@@ -139,7 +134,7 @@ class ProductServiceImplTest {
         String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
         when(productRepository.delete(productId)).thenReturn(product);
 
-        Product result = productService.delete(productId);
+        Product result = productCommandServiceImpl.delete(productId);
 
         assertEquals(product, result);
         assertEquals(productId, result.getProductId());
@@ -151,7 +146,7 @@ class ProductServiceImplTest {
     void testEdit_shouldCallRepositoryAndReturnUpdatedProduct() {
         when(productRepository.edit(product)).thenReturn(product);
 
-        Product result = productService.edit(product);
+        Product result = productCommandServiceImpl.edit(product);
 
         assertEquals(product, result);
         assertEquals("Sampo Cap Bambang", result.getProductName());
@@ -164,7 +159,7 @@ class ProductServiceImplTest {
     void testCreate_shouldNotReturnNull() {
         when(productRepository.create(product)).thenReturn(product);
 
-        Product result = productService.create(product);
+        Product result = productCommandServiceImpl.create(product);
 
         assertNotNull(result);
     }
@@ -178,7 +173,7 @@ class ProductServiceImplTest {
 
         when(productRepository.create(product)).thenReturn(product);
 
-        Product result = productService.create(product);
+        Product result = productCommandServiceImpl.create(product);
 
         assertNotEquals(differentProduct.getProductId(), result.getProductId());
         assertNotEquals(differentProduct.getProductName(), result.getProductName());
@@ -193,7 +188,7 @@ class ProductServiceImplTest {
 
         when(productRepository.findAll()).thenReturn(productIterator);
 
-        List<Product> result = productService.findAll();
+        List<Product> result = productQueryServiceImpl.findAll();
 
         assertNotNull(result);
     }
@@ -210,7 +205,7 @@ class ProductServiceImplTest {
 
         when(productRepository.findAll()).thenReturn(productIterator);
 
-        List<Product> result = productService.findAll();
+        List<Product> result = productQueryServiceImpl.findAll();
 
         assertNotEquals(0, result.size());
         assertNotEquals(1, result.size());
@@ -224,7 +219,7 @@ class ProductServiceImplTest {
         String productId = "non-existing-id";
         when(productRepository.findById(productId)).thenReturn(null);
 
-        Product result = productService.findById(productId);
+        Product result = productQueryServiceImpl.findById(productId);
 
         assertNull(result);
         verify(productRepository, times(1)).findById(productId);
@@ -238,7 +233,7 @@ class ProductServiceImplTest {
                 .thenThrow(new RuntimeException("Product with ID " + productId + " not found"));
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            productService.delete(productId);
+            productCommandServiceImpl.delete(productId);
         });
 
         assertEquals("Product with ID non-existing-id not found", exception.getMessage());
@@ -257,7 +252,7 @@ class ProductServiceImplTest {
                 .thenThrow(new RuntimeException("Product with ID non-existing-id not found"));
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            productService.edit(updatedProduct);
+            productCommandServiceImpl.edit(updatedProduct);
         });
 
         assertEquals("Product with ID non-existing-id not found", exception.getMessage());
@@ -269,7 +264,7 @@ class ProductServiceImplTest {
     void testCreate_shouldCallRepositoryExactlyOnce() {
         when(productRepository.create(product)).thenReturn(product);
 
-        productService.create(product);
+        productCommandServiceImpl.create(product);
         verify(productRepository, times(1)).create(product);
         verifyNoMoreInteractions(productRepository);
     }
@@ -281,7 +276,7 @@ class ProductServiceImplTest {
 
         when(productRepository.findAll()).thenReturn(productIterator);
 
-        productService.findAll();
+        productQueryServiceImpl.findAll();
 
         verify(productRepository, times(1)).findAll();
         verify(productRepository, atMostOnce()).findAll();

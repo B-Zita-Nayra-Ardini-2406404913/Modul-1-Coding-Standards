@@ -1,6 +1,8 @@
 package id.ac.ui.cs.advprog.eshop.controller;
 
 import id.ac.ui.cs.advprog.eshop.model.Product;
+import id.ac.ui.cs.advprog.eshop.service.ProductQueryService;
+import id.ac.ui.cs.advprog.eshop.service.ProductCommandService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,11 +20,19 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ProductControllerTest {
 
+    // ProductReadController Tests
     @InjectMocks
-    private ProductController productController;
+    private ProductReadController productReadController;
+
+    // ProductWriteController Tests
+    @InjectMocks
+    private ProductWriteController productWriteController;
 
     @Mock
-    private ProductService productService;
+    private ProductQueryService productQueryService;
+
+    @Mock
+    private ProductCommandService productCommandService;
 
     @Mock
     private Model model;
@@ -37,36 +47,37 @@ class ProductControllerTest {
         product.setProductQuantity(100);
     }
 
-    // Positive Tests - Create
+    // ==================== READ CONTROLLER TESTS ====================
+
+    // Positive Tests - Create Page (Read Controller)
     @Test
     void testCreateProductPage_shouldReturnCorrectViewName() {
-        String viewName = productController.createProductPage(model);
+        String viewName = productReadController.createProductPage(model);
 
         assertEquals("createProduct", viewName);
         verify(model, times(1)).addAttribute(eq("product"), any(Product.class));
     }
 
     @Test
-    void testCreateProductPost_shouldCallServiceAndRedirect() {
-        when(productService.create(any(Product.class))).thenReturn(product);
+    void testCreateProductPage_shouldNotReturnWrongViewName() {
+        String viewName = productReadController.createProductPage(model);
 
-        String viewName = productController.createProductPost(product, model);
-
-        assertEquals("redirect:/product/list", viewName);
-        verify(productService, times(1)).create(product);
+        assertNotEquals("productList", viewName);
+        assertNotEquals("wrongView", viewName);
+        assertNotEquals("editProduct", viewName);
     }
 
-    // Positive Tests - List
+    // Positive Tests - List Page (Read Controller)
     @Test
     void testProductListPage_shouldReturnCorrectViewName() {
         List<Product> productList = new ArrayList<>();
         productList.add(product);
-        when(productService.findAll()).thenReturn(productList);
+        when(productQueryService.findAll()).thenReturn(productList);
 
-        String viewName = productController.productListPage(model);
+        String viewName = productReadController.productListPage(model);
 
         assertEquals("productList", viewName);
-        verify(productService, times(1)).findAll();
+        verify(productQueryService, times(1)).findAll();
         verify(model, times(1)).addAttribute("products", productList);
     }
 
@@ -74,54 +85,55 @@ class ProductControllerTest {
     void testProductListPage_shouldAddProductsToModel() {
         List<Product> productList = new ArrayList<>();
         productList.add(product);
-        when(productService.findAll()).thenReturn(productList);
+        when(productQueryService.findAll()).thenReturn(productList);
 
-        productController.productListPage(model);
+        productReadController.productListPage(model);
 
         verify(model, times(1)).addAttribute("products", productList);
     }
 
-    // Positive Tests - Delete
     @Test
-    void testDeleteProduct_shouldCallServiceAndRedirect() {
-        String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
-        when(productService.delete(productId)).thenReturn(product);
+    void testProductListPage_shouldNotReturnWrongViewName() {
+        List<Product> productList = new ArrayList<>();
+        when(productQueryService.findAll()).thenReturn(productList);
 
-        String viewName = productController.deleteProduct(productId);
+        String viewName = productReadController.productListPage(model);
 
-        assertEquals("redirect:/product/list", viewName);
-        verify(productService, times(1)).delete(productId);
+        assertNotEquals("createProduct", viewName);
+        assertNotEquals("wrongView", viewName);
+        assertNotEquals("editProduct", viewName);
     }
 
     @Test
-    void testDeleteProduct_shouldCallDeleteWithCorrectId() {
-        String productId = "test-product-id";
-        when(productService.delete(productId)).thenReturn(product);
+    void testProductListPage_withEmptyList_shouldStillWork() {
+        List<Product> emptyList = new ArrayList<>();
+        when(productQueryService.findAll()).thenReturn(emptyList);
 
-        productController.deleteProduct(productId);
+        String viewName = productReadController.productListPage(model);
 
-        verify(productService, times(1)).delete(productId);
+        assertEquals("productList", viewName);
+        verify(model, times(1)).addAttribute("products", emptyList);
     }
 
-    // Positive Tests - Edit
+    // Positive Tests - Edit Page (Read Controller)
     @Test
     void testEditProductPage_shouldReturnCorrectViewName() {
         String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
-        when(productService.findById(productId)).thenReturn(product);
+        when(productQueryService.findById(productId)).thenReturn(product);
 
-        String viewName = productController.editProductPage(productId, model);
+        String viewName = productReadController.editProductPage(productId, model);
 
         assertEquals("editProduct", viewName);
-        verify(productService, times(1)).findById(productId);
+        verify(productQueryService, times(1)).findById(productId);
         verify(model, times(1)).addAttribute("product", product);
     }
 
     @Test
     void testEditProductPage_shouldAddProductToModel() {
         String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
-        when(productService.findById(productId)).thenReturn(product);
+        when(productQueryService.findById(productId)).thenReturn(product);
 
-        productController.editProductPage(productId, model);
+        productReadController.editProductPage(productId, model);
 
         verify(model, times(1)).addAttribute("product", product);
     }
@@ -129,105 +141,19 @@ class ProductControllerTest {
     @Test
     void testEditProductPage_shouldFindProductById() {
         String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
-        when(productService.findById(productId)).thenReturn(product);
+        when(productQueryService.findById(productId)).thenReturn(product);
 
-        productController.editProductPage(productId, model);
+        productReadController.editProductPage(productId, model);
 
-        verify(productService, times(1)).findById(productId);
+        verify(productQueryService, times(1)).findById(productId);
     }
 
-    @Test
-    void testEditProductPost_shouldCallServiceAndRedirect() {
-        when(productService.edit(product)).thenReturn(product);
-
-        String viewName = productController.editProductPost(product, model);
-
-        assertEquals("redirect:list", viewName);
-        verify(productService, times(1)).edit(product);
-    }
-
-    @Test
-    void testEditProductPost_shouldCallEditWithCorrectProduct() {
-        when(productService.edit(product)).thenReturn(product);
-
-        productController.editProductPost(product, model);
-
-        verify(productService, times(1)).edit(product);
-    }
-
-    // Negative Tests - Create
-    @Test
-    void testCreateProductPage_shouldNotReturnWrongViewName() {
-        String viewName = productController.createProductPage(model);
-
-        assertNotEquals("productList", viewName);
-        assertNotEquals("wrongView", viewName);
-    }
-
-    @Test
-    void testCreateProductPost_shouldNotReturnWrongRedirect() {
-        when(productService.create(any(Product.class))).thenReturn(product);
-
-        String viewName = productController.createProductPost(product, model);
-
-        assertNotEquals("redirect:create", viewName);
-        assertNotEquals("createProduct", viewName);
-    }
-
-    // Negative Tests - List
-    @Test
-    void testProductListPage_shouldNotReturnWrongViewName() {
-        List<Product> productList = new ArrayList<>();
-        when(productService.findAll()).thenReturn(productList);
-
-        String viewName = productController.productListPage(model);
-
-        assertNotEquals("createProduct", viewName);
-        assertNotEquals("wrongView", viewName);
-    }
-
-    @Test
-    void testProductListPage_withEmptyList_shouldStillWork() {
-        List<Product> emptyList = new ArrayList<>();
-        when(productService.findAll()).thenReturn(emptyList);
-
-        String viewName = productController.productListPage(model);
-
-        assertEquals("productList", viewName);
-        verify(model, times(1)).addAttribute("products", emptyList);
-    }
-
-    // Negative Tests - Delete
-    @Test
-    void testDeleteProduct_shouldNotReturnWrongRedirect() {
-        String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
-        when(productService.delete(productId)).thenReturn(product);
-
-        String viewName = productController.deleteProduct(productId);
-
-        assertNotEquals("redirect:/product/create", viewName);
-        assertNotEquals("redirect:/product/edit", viewName);
-        assertNotEquals("deleteProduct", viewName);
-    }
-
-    @Test
-    void testDeleteProduct_shouldNotCallServiceMultipleTimes() {
-        String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
-        when(productService.delete(productId)).thenReturn(product);
-
-        productController.deleteProduct(productId);
-
-        verify(productService, times(1)).delete(productId);
-        verify(productService, atMostOnce()).delete(productId);
-    }
-
-    // Negative Tests - Edit
     @Test
     void testEditProductPage_shouldNotReturnWrongViewName() {
         String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
-        when(productService.findById(productId)).thenReturn(product);
+        when(productQueryService.findById(productId)).thenReturn(product);
 
-        String viewName = productController.editProductPage(productId, model);
+        String viewName = productReadController.editProductPage(productId, model);
 
         assertNotEquals("createProduct", viewName);
         assertNotEquals("productList", viewName);
@@ -237,19 +163,75 @@ class ProductControllerTest {
     @Test
     void testEditProductPage_shouldNotCallFindByIdMultipleTimes() {
         String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
-        when(productService.findById(productId)).thenReturn(product);
+        when(productQueryService.findById(productId)).thenReturn(product);
 
-        productController.editProductPage(productId, model);
+        productReadController.editProductPage(productId, model);
 
-        verify(productService, times(1)).findById(productId);
-        verify(productService, atMostOnce()).findById(productId);
+        verify(productQueryService, times(1)).findById(productId);
+        verify(productQueryService, atMostOnce()).findById(productId);
+    }
+
+    // Negative Tests - when product not found
+    @Test
+    void testEditProductPage_withNullProduct_shouldStillReturnView() {
+        String productId = "non-existent-id";
+        when(productQueryService.findById(productId)).thenReturn(null);
+
+        String viewName = productReadController.editProductPage(productId, model);
+
+        assertEquals("editProduct", viewName);
+        verify(model, times(1)).addAttribute("product", null);
+    }
+
+    // ==================== WRITE CONTROLLER TESTS ====================
+
+    // Positive Tests - Create Post (Write Controller)
+    @Test
+    void testCreateProductPost_shouldCallServiceAndRedirect() {
+        when(productCommandService.create(any(Product.class))).thenReturn(product);
+
+        String viewName = productWriteController.createProductPost(product);
+
+        assertEquals("redirect:/product/list", viewName);
+        verify(productCommandService, times(1)).create(product);
+    }
+
+    @Test
+    void testCreateProductPost_shouldNotReturnWrongRedirect() {
+        when(productCommandService.create(any(Product.class))).thenReturn(product);
+
+        String viewName = productWriteController.createProductPost(product);
+
+        assertNotEquals("redirect:create", viewName);
+        assertNotEquals("createProduct", viewName);
+        assertNotEquals("redirect:/product/create", viewName);
+    }
+
+    // Positive Tests - Edit Post (Write Controller)
+    @Test
+    void testEditProductPost_shouldCallServiceAndRedirect() {
+        when(productCommandService.edit(product)).thenReturn(product);
+
+        String viewName = productWriteController.editProductPost(product);
+
+        assertEquals("redirect:list", viewName);
+        verify(productCommandService, times(1)).edit(product);
+    }
+
+    @Test
+    void testEditProductPost_shouldCallEditWithCorrectProduct() {
+        when(productCommandService.edit(product)).thenReturn(product);
+
+        productWriteController.editProductPost(product);
+
+        verify(productCommandService, times(1)).edit(product);
     }
 
     @Test
     void testEditProductPost_shouldNotReturnWrongRedirect() {
-        when(productService.edit(product)).thenReturn(product);
+        when(productCommandService.edit(product)).thenReturn(product);
 
-        String viewName = productController.editProductPost(product, model);
+        String viewName = productWriteController.editProductPost(product);
 
         assertNotEquals("redirect:/product/create", viewName);
         assertNotEquals("editProduct", viewName);
@@ -258,21 +240,89 @@ class ProductControllerTest {
 
     @Test
     void testEditProductPost_shouldNotCallServiceMultipleTimes() {
-        when(productService.edit(product)).thenReturn(product);
+        when(productCommandService.edit(product)).thenReturn(product);
 
-        productController.editProductPost(product, model);
+        productWriteController.editProductPost(product);
 
-        verify(productService, times(1)).edit(product);
-        verify(productService, atMostOnce()).edit(product);
+        verify(productCommandService, times(1)).edit(product);
+        verify(productCommandService, atMostOnce()).edit(product);
     }
 
     @Test
     void testEditProductPost_withNullProduct_shouldStillCallService() {
         Product nullProduct = null;
-        when(productService.edit(any())).thenReturn(product);
+        when(productCommandService.edit(any())).thenReturn(product);
 
-        productController.editProductPost(nullProduct, model);
+        productWriteController.editProductPost(nullProduct);
 
-        verify(productService, times(1)).edit(nullProduct);
+        verify(productCommandService, times(1)).edit(nullProduct);
+    }
+
+    // Positive Tests - Delete (Write Controller)
+    @Test
+    void testDeleteProduct_shouldCallServiceAndRedirect() {
+        String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
+        when(productCommandService.delete(productId)).thenReturn(product);
+
+        String viewName = productWriteController.deleteProduct(productId);
+
+        assertEquals("redirect:/product/list", viewName);
+        verify(productCommandService, times(1)).delete(productId);
+    }
+
+    @Test
+    void testDeleteProduct_shouldCallDeleteWithCorrectId() {
+        String productId = "test-product-id";
+        when(productCommandService.delete(productId)).thenReturn(product);
+
+        productWriteController.deleteProduct(productId);
+
+        verify(productCommandService, times(1)).delete(productId);
+    }
+
+    @Test
+    void testDeleteProduct_shouldNotReturnWrongRedirect() {
+        String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
+        when(productCommandService.delete(productId)).thenReturn(product);
+
+        String viewName = productWriteController.deleteProduct(productId);
+
+        assertNotEquals("redirect:/product/create", viewName);
+        assertNotEquals("redirect:/product/edit", viewName);
+        assertNotEquals("deleteProduct", viewName);
+    }
+
+    @Test
+    void testDeleteProduct_shouldNotCallServiceMultipleTimes() {
+        String productId = "eb5589f-1c39-460e-8860-71af6af63bd6";
+        when(productCommandService.delete(productId)).thenReturn(product);
+
+        productWriteController.deleteProduct(productId);
+
+        verify(productCommandService, times(1)).delete(productId);
+        verify(productCommandService, atMostOnce()).delete(productId);
+    }
+
+    // Edge Cases
+    @Test
+    void testDeleteProduct_withEmptyId_shouldStillCallService() {
+        String emptyId = "";
+        when(productCommandService.delete(emptyId)).thenReturn(product);
+
+        String viewName = productWriteController.deleteProduct(emptyId);
+
+        assertEquals("redirect:/product/list", viewName);
+        verify(productCommandService, times(1)).delete(emptyId);
+    }
+
+    @Test
+    void testDeleteProduct_withNullId_shouldStillCallService() {
+        String nullId = null;
+        when(productCommandService.delete(nullId)).thenReturn(product);
+
+        String viewName = productWriteController.deleteProduct(nullId);
+
+        assertEquals("redirect:/product/list", viewName);
+        verify(productCommandService, times(1)).delete(nullId);
     }
 }
